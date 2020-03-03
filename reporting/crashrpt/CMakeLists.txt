@@ -18,7 +18,7 @@ add_definitions(-D_UNICODE -D_CRT_SECURE_NO_DEPRECATE)
 fix_default_compiler_settings_()
 
 # Add include dir
-include_directories( ${CRASHRPT_SRC}/include ${CRASHRPT_SRC}/thirdparty/wtl)
+#include_directories( ${CRASHRPT_SRC}/include ${CRASHRPT_SRC}/thirdparty/wtl)
 
 # Add library build target
 if(CRASHRPT_BUILD_SHARED_LIBS)
@@ -26,6 +26,15 @@ if(CRASHRPT_BUILD_SHARED_LIBS)
 else(CRASHRPT_BUILD_SHARED_LIBS)
   add_library(CrashRpt STATIC ${source_files} ${header_files})
 endif(CRASHRPT_BUILD_SHARED_LIBS)
+
+# Add include directories
+target_include_directories(CrashRpt PRIVATE
+  ${CRASHRPT_SRC}/include ${CRASHRPT_SRC}/reporting/crashrpt ${CRASHRPT_SRC}/thirdparty/wtl
+)
+target_include_directories(CrashRpt PUBLIC
+  $<BUILD_INTERFACE:${CRASHRPT_SRC}/include>
+  $<INSTALL_INTERFACE:include>  # <prefix>/include/mylib
+)
 
 # Specify what libraries to link
 target_link_libraries(CrashRpt rpcrt4.dll version.lib)

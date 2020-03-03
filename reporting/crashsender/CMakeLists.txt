@@ -20,10 +20,35 @@ add_definitions(-D_UNICODE )
 
 fix_default_compiler_settings_()
 
-# Add include dir
-include_directories(
+## Add include dir
+#include_directories(
+#  ${CRASHRPT_SRC}/include
+#  ${CRASHRPT_SRC}/reporting/crashrpt
+#  ${CRASHRPT_SRC}/thirdparty/wtl
+#  ${CRASHRPT_SRC}/thirdparty/zlib
+#  ${CRASHRPT_SRC}/thirdparty/minizip
+#  ${CRASHRPT_SRC}/thirdparty/jpeg
+#  ${CRASHRPT_SRC}/thirdparty/libpng
+#  ${CRASHRPT_SRC}/thirdparty/tinyxml
+#  ${DBGHELP_INCLUDE_DIR}
+#  ${CRASHRPT_SRC}/thirdparty/libogg/include
+#  ${CRASHRPT_SRC}/thirdparty/libtheora/include
+#)
+
+if(NOT CMAKE_CL_64)
+  link_directories( ${CRASHRPT_SRC}/thirdparty/dbghelp/lib )
+else(NOT CMAKE_CL_64)
+  link_directories( ${CRASHRPT_SRC}/thirdparty/dbghelp/lib/amd64 )
+endif(NOT CMAKE_CL_64)
+
+# Add executable build target
+add_executable(CrashSender WIN32 ${source_files} ${header_files})
+
+# Add include directories
+target_include_directories(CrashSender PRIVATE
   ${CRASHRPT_SRC}/include
-  ${CRASHRPT_SRC}/reporting/CrashRpt
+  ${CRASHRPT_SRC}/reporting/crashsender
+  ${CRASHRPT_SRC}/reporting/crashrpt
   ${CRASHRPT_SRC}/thirdparty/wtl
   ${CRASHRPT_SRC}/thirdparty/zlib
   ${CRASHRPT_SRC}/thirdparty/minizip
@@ -34,15 +59,10 @@ include_directories(
   ${CRASHRPT_SRC}/thirdparty/libogg/include
   ${CRASHRPT_SRC}/thirdparty/libtheora/include
 )
-
-if(NOT CMAKE_CL_64)
-  link_directories( ${CRASHRPT_SRC}/thirdparty/dbghelp/lib )
-else(NOT CMAKE_CL_64)
-  link_directories( ${CRASHRPT_SRC}/thirdparty/dbghelp/lib/amd64 )
-endif(NOT CMAKE_CL_64)
-
-# Add executable build target
-add_executable(CrashSender WIN32 ${source_files} ${header_files})
+target_include_directories(CrashSender PUBLIC
+  $<BUILD_INTERFACE:${CRASHRPT_SRC}/include>
+  $<INSTALL_INTERFACE:include>  # <prefix>/include/mylib
+)
 
 # Add input link libraries
 target_link_libraries(CrashSender 
